@@ -1,0 +1,4 @@
+1. Make the world open, dynamically generating (and deleting) objects that are close (far) enough.
+2. Show the light wave as it expands.
+3. Make the lightwave more subtle while travelling through vacuum.
+4. Let the light shine a little more onto a planet, revealing a tiny bit of its surface (1-10 px maybe, depending on the angle of the light source)

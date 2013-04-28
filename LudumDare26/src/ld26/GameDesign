@@ -1,0 +1,43 @@
+Class Diagram:
+
+*Canvas:
+	int [][] canvas //rate of luminosity
+	
+*Map:
+	ArrayList<celestialBodies> bodies
+	boolean[][] world
+	Canvas canvas
+	int camX, camY
+	
+*CelestialBody:
+	int x,y
+	float vx, vy, ax, ay
+	float mass
+	int radius
+	Color color
+**Star
+	int luminosity
+**Planet
+**Meteorite
+**Player:
+	String name
+	
+	
+	
+Methods:
+
+updateWorld():
+*updateBodies():
+	calcForces()
+	calcAcc()
+	calcVel()
+	calcPos()
+	updateLightWave()
+	collisionCheck()
+	*handleCollision()
+*updateCam()
+*calcLight()
+updateCanvas()
+
+Player:
+emitLight()
