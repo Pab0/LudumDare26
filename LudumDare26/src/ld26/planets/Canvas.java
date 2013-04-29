@@ -1,6 +1,7 @@
 package ld26.planets;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -15,12 +16,13 @@ import ld26.tools.Timer;
 
 public class Canvas extends JPanel implements KeyListener{
 
-	static final int WIDTH = 750;
-	static final int HEIGHT = 450;
+	static final int WIDTH = 720;
+	static final int HEIGHT = 440;
 
 	Map lnkMap;
 	Player lnkPlayer;
 	char input;
+	public boolean welcomeScreen, endingScreen, potatoScreen, hasWon, restart;
 
 	static Timer timer;
 	int millis;
@@ -58,17 +60,78 @@ public class Canvas extends JPanel implements KeyListener{
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.add(this);
 		frame.setVisible(true);
+
+		welcomeScreen = true;
 	}
 
 	@Override
 	public void paintComponent(Graphics g)
 	{
 		super.paintComponent(g);
-		if (this.lnkMap!=null)
+		if (welcomeScreen)
 		{
-			this.paintTask(g);
+			this.paintWelcome(g);
+		}
+		else if (!welcomeScreen && !endingScreen)
+		{
+			if (this.lnkMap!=null)
+			{
+				this.paintTask(g);
+			}
+		}
+		if (endingScreen)
+		{
+			this.paintEnding(g);
 		}
 		repaint();
+	}
+
+	private void paintWelcome(Graphics g)
+	{
+		String str0 = "Hello! Welcome to \"Planets\"!";
+		String str1 = "You are a lonely, golden planet, who must survive against the rest of the celestial objects.";
+		String str2 = "But beware! Bigger objects icorporate smaller bodies!";
+		String str3 = "Move with WASD. Press SPACE to begin. Good luck!";
+		String str4 = "\n\n\n\nMade by Pabo for the Ludum Dare 26 competition on 28/29 April 2013.";
+		g.setColor(Color.BLUE);
+		g.fillRect(0, 0, Canvas.WIDTH, Canvas.HEIGHT);
+		g.setColor(Color.BLACK);
+		g.setFont(new Font("BOLD", 0, 18));
+		g.drawString(str0, 10, Map.HEIGHT/10);
+		g.drawString(str1, 10, Map.HEIGHT/10+20);
+		g.drawString(str2, 10, Map.HEIGHT/10+40);
+		g.drawString(str3, 10, Map.HEIGHT/10+60);
+		g.drawString(str4, 10, Map.HEIGHT/10+80);
+	}
+
+	private void paintEnding(Graphics g)
+	{
+		String str0 = "Congratulations, you beat all the other planets!.";
+		String str1 = "Hmm, it's pretty lonely now, isn't it?";
+		String str2 = "Anyways, press SPACE to get your reward!";
+
+		String str3 = "GAME OVER";
+		String str4 = "Start again? [SPACE]";
+		g.setColor(Color.BLUE);
+		g.fillRect(0, 0, Canvas.WIDTH, Canvas.HEIGHT);
+		g.setColor(Color.BLACK);
+		g.setFont(new Font("BOLD", 0, 18));
+		if (hasWon)
+		{
+			g.drawString(str0, 10, Map.HEIGHT/10);
+			g.drawString(str1, 10, Map.HEIGHT/10+20);
+			//g.drawString(str2, 10, Map.HEIGHT/10+40);			
+		}
+		else
+		{
+			g.setFont(new Font("BOLD", 0, 20));
+			g.drawString(str3, 300, 200);
+			//g.drawString(str4, 10, Map.HEIGHT/10+20);
+			if (restart)
+			{
+				//endingScreen = false;
+			}
+		}
 	}
 
 	private void paintTask(Graphics g)
@@ -98,7 +161,7 @@ public class Canvas extends JPanel implements KeyListener{
 			for (int j=0; j<Map.HEIGHT; j++)
 			{
 				if (this.color[i][j]!=Color.BLACK)
-				//if (this.lnkPlayer.footprint[i][j])
+					//if (this.lnkPlayer.footprint[i][j])
 				{					
 					this.brightness[i][j] = 1;
 				}
@@ -215,6 +278,15 @@ public class Canvas extends JPanel implements KeyListener{
 		case 'D':
 			lnkPlayer.westward = true;
 			break;
+		case ' ':
+			if (welcomeScreen)
+			{
+				this.welcomeScreen = false;			
+			}
+			else if (endingScreen)
+			{
+				this.restart = true;
+			}			
 		default:
 			break;
 		}

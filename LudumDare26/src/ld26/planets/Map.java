@@ -16,6 +16,7 @@ public class Map {
 	ArrayList<CelestialBody> bodies;
 	Player player;
 	boolean[][] world;		//used for collision
+	LightWave lightwave;
 	boolean[][] lightWave;	//the points that the light wave currently occupies
 	int camX, camY;
 	Random random;
@@ -444,6 +445,16 @@ public class Map {
 
 	private void removeBody(int b)
 	{
+		if (this.bodies.get(b) instanceof Player)
+		{
+			canvas.endingScreen = true;
+			canvas.hasWon = false;
+		}
+		if (this.bodies.size()==2)
+		{
+			canvas.endingScreen = true;
+			canvas.hasWon = true;
+		}
 		this.bodies.remove(b);
 		this.bodies.trimToSize();
 		System.out.println("A celestial body was destroyed.");
