@@ -8,7 +8,7 @@ import ld26.tools.RandomColor;
 
 public class Map {
 
-	public static final int BODY_NUM = 15;
+	public static final int BODY_NUM = 55;
 	public static final int WIDTH = 700;
 	public static final int HEIGHT = 400;
 	public static final int BORDER_WIDTH = 10;
@@ -104,11 +104,11 @@ public class Map {
 				player = new Player(mass, posX, posY, Color.decode("0xCDAE00"));
 				tmpArray = player.footprint;
 				collision = false;
-				for (int k=0; k<Map.WIDTH; k++)
+				for (int k=player.x1; k<player.x2; k++)
 				{
-					for (int l=0; l<Map.HEIGHT; l++)
+					for (int l=player.y1; l<player.y2; l++)
 					{
-						if (tmpArray[k][l] && world[k][l])
+						if (tmpArray[k-player.x1][l-player.y1] && world[k][l])
 						{
 							collision = true;
 						}						
@@ -121,11 +121,11 @@ public class Map {
 			}
 		}while(collision);
 		bodies.add(player);
-		for (int m=0; m<Map.WIDTH; m++)
+		for (int m=player.x1; m<player.x2; m++)
 		{
-			for (int n=0; n<Map.HEIGHT; n++)
+			for (int n=player.y1; n<player.y2; n++)
 			{
-				this.world[m][n] = this.world[m][n] || tmpArray[m][n];
+				this.world[m][n] = this.world[m][n] || tmpArray[m-player.x1][n-player.y1];
 			}
 		}
 		System.out.println("Created golden Player "
@@ -158,11 +158,11 @@ public class Map {
 					cb = new CelestialBody(mass, posX, posY, colour);
 					tmpArray = cb.footprint;
 					collision = false;
-					for (int k=0; k<Map.WIDTH; k++)
+					for (int k=cb.x1; k<cb.x2; k++)
 					{
-						for (int l=0; l<Map.HEIGHT; l++)
+						for (int l=cb.y1; l<cb.y2; l++)
 						{
-							if (tmpArray[k][l] && world[k][l])
+							if (tmpArray[k-cb.x1][l-cb.y1] && world[k][l])
 							{
 								collision = true;
 							}						
@@ -175,11 +175,11 @@ public class Map {
 				}
 			}while(collision);
 			bodies.add(cb);
-			for (int m=0; m<Map.WIDTH; m++)
+			for (int m=cb.x1; m<cb.x2; m++)
 			{
-				for (int n=0; n<Map.HEIGHT; n++)
+				for (int n=cb.y1; n<cb.y2; n++)
 				{
-					this.world[m][n] = this.world[m][n] || tmpArray[m][n];
+					this.world[m][n] = this.world[m][n] || tmpArray[m-cb.x1][n-cb.y1];
 				}
 			}
 			System.out.println("Created " + colour.toString()
@@ -192,11 +192,14 @@ public class Map {
 	void updateMap()
 	{
 		collisionCheck();
+		System.out.println("Map update - collisionCheck: " + Canvas.debugTimer.getElapsedTimeMil());
 		updateBodies();
+		System.out.println("Map update - updateBodies: " + Canvas.debugTimer.getElapsedTimeMil());
 		//updateLightWave();
 		//updateCam();
 		//calcLight();
 		updateWorld();
+		System.out.println("Map update - updateWorld: " + Canvas.debugTimer.getElapsedTimeMil());
 	}
 
 	private void setBorder()
@@ -208,12 +211,12 @@ public class Map {
 	{
 		for (int i=0; i<bodies.size(); i++)
 		{
-			float secs = (float)(canvas.millis/1000.0f);
+			float secs = (float)(canvas.millis)*0.001f;
 			CelestialBody cb = bodies.get(i);
 			//calcForces();
 			cb.calcAcc(secs);
 			cb.calcVel(secs);
-			cb.calcPos(secs);			
+			cb.calcPos(secs);
 			cb.updateFootprint();
 		}
 	}
@@ -242,11 +245,12 @@ public class Map {
 		for (int i=0; i<this.bodies.size(); i++)
 		{
 			CelestialBody cb = this.bodies.get(i);
-			for (int k=0; k<Map.WIDTH; k++)
+			boolean[][] fp = cb.footprint;
+			for (int k=cb.x1; k<cb.x2; k++)
 			{
-				for (int l=0; l<Map.HEIGHT; l++)
+				for (int l=cb.y1; l<cb.y2; l++)
 				{
-					if (cb.footprint[k][l])
+					if (fp[k-cb.x1][l-cb.y1])
 					{
 						this.world[k][l] = true;
 					}
@@ -318,7 +322,7 @@ public class Map {
 			{
 				for (int j=cb.y1; j<cb.y2; j++)
 				{
-					if (cb.footprint[i][j])
+					if (cb.footprint[i-cb.x1][j-cb.y1])
 					{
 						if (borderArray[i][j])
 						{
@@ -344,10 +348,10 @@ public class Map {
 							//calculating radius
 							float tmp=0;
 							tmp = (float)(cbOld.radius - (Math.sqrt(Math.abs(cbOld.x-x)*Math.abs(cbOld.x-x) + Math.abs(cbOld.y-y)*Math.abs(cbOld.y-y))));
+							System.out.println("DEBUG: tmp=" + tmp);
 							if (tmp>radiusdepth)
 							{
 								radiusdepth = (int)tmp + 1;		//+1 to compensate for the rounding to int
-								System.out.println(tmp);
 							}
 
 							index = b;
@@ -394,6 +398,7 @@ public class Map {
 			updateFootprints();
 		}
 		checkBodySize(cbSmall);
+		System.out.println("DEBUG: cbBig.radius=" + cbBig.radius + ", cbSmall.radius=" + cbSmall.radius);
 	}
 
 	private void handleBorderCollision(CelestialBody cb, int maxX, int minX, int maxY, int minY)

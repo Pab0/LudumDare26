@@ -25,6 +25,7 @@ public class Canvas extends JPanel implements KeyListener{
 	public boolean welcomeScreen, endingScreen, potatoScreen, hasWon, restart;
 
 	static Timer timer;
+	static Timer debugTimer;
 	int millis;
 
 	public int[][] brightness;	//determines brightness at x,y.
@@ -48,6 +49,7 @@ public class Canvas extends JPanel implements KeyListener{
 		}
 
 		timer = new Timer();
+		debugTimer = new Timer();
 
 		this.setDoubleBuffered(true);
 		this.setFocusable(true);
@@ -137,14 +139,19 @@ public class Canvas extends JPanel implements KeyListener{
 	private void paintTask(Graphics g)
 	{
 		millis = (int)timer.getElapsedTimeMil();
-		System.out.println("framerate: " + millis + "ms");
+		System.out.println("Framerate: " + millis + "ms\n");
 		this.lnkMap.updateMap();
+		System.out.println("Map update: " + debugTimer.getElapsedTimeMil());
 		drawBackground(g);
+		System.out.println("Draw background: " + debugTimer.getElapsedTimeMil());
 		//calcBrightness(g);
 		calcFauxBrightness(g);
+		System.out.println("Faux Brightness: " + debugTimer.getElapsedTimeMil());
 		calcColor(g);
 		//calcCanvas(g);
+		System.out.println("Color calc: " + debugTimer.getElapsedTimeMil());
 		drawCanvas(g);
+		System.out.println("Drawing canvas: " + debugTimer.getElapsedTimeMil());
 	}
 
 	private void drawBackground(Graphics g)
@@ -214,16 +221,17 @@ public class Canvas extends JPanel implements KeyListener{
 		{
 			CelestialBody cb = this.lnkMap.bodies.get(i);
 			Color c = cb.color;
-			int x1 = cb.x - (int)cb.radius;
-			int x2 = cb.x + (int)cb.radius+1;
-			int y1 = cb.y - (int)cb.radius;
-			int y2 = cb.y + (int)cb.radius+1;
+			int intRadius = (int)cb.radius;
+			int x1 = cb.x - intRadius;
+			int x2 = cb.x + intRadius+1;
+			int y1 = cb.y - intRadius;
+			int y2 = cb.y + intRadius+1;
 			boolean[][] tmpArray = cb.footprint;
 			for (int k=x1; k<x2; k++)
 			{
 				for (int l=y1; l<y2; l++)
 				{
-					if (tmpArray[k][l])
+					if (tmpArray[k-cb.x1][l-cb.y1])
 					{
 						this.color[k][l] = c;
 					}

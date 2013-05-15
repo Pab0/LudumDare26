@@ -5,14 +5,9 @@ public class TestTimer {
 	public static void main(String[] args)
 	{
 		Timer timer = new Timer();
-		for (int i=0; i<20; i++)
+		for (int i=0; i<2000000; i++)
 		{
 			System.out.println(i + ": " + timer.getElapsedTimeMil());
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
 		}
 	}
 }

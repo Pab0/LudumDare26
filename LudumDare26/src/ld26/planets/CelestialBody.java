@@ -1,6 +1,9 @@
 package ld26.planets;
 
 import java.awt.Color;
+import java.util.Arrays;
+
+import ld26.tools.Timer;
 
 
 /*
@@ -14,7 +17,7 @@ public class CelestialBody {
 	public static final int BODY_NUM = 5;
 
 	int x,y;		//x,y are at the center of the body.
-	int x1, x2, y1, y2;
+	int x1, x2, y1, y2;		//designate the corners of the rectangle on the map engulfing the footprint
 	float realX,realY;
 	float vx, vy, ax, ay;
 	boolean northward = false;
@@ -24,7 +27,7 @@ public class CelestialBody {
 	float mass;
 	float radius;
 	Color color;
-	boolean[][] footprint = new boolean[Map.WIDTH][Map.HEIGHT];
+	boolean[][] footprint;
 
 	public CelestialBody(float mass, int posX, int posY, Color color)
 	{
@@ -39,6 +42,7 @@ public class CelestialBody {
 		this.mass = mass;
 		this.radius = calcRadius(mass);
 		this.color = color;
+		this.footprint = new boolean[(int)(2*this.radius)+1][(int)(2*this.radius)+1];
 		this.footprint = this.calcFootprint();
 		MAX_RADIUS = this.calcRadius(MAX_MASS);
 	}
@@ -58,27 +62,27 @@ public class CelestialBody {
 		return m;
 	}
 
-	//returns an array of Map dimensions, with "true" inside the circle and "false" outside of it
+	//returns an array of [2*radius][2*radius] dimensions, with "true" inside the circle and "false" outside of it
 	public boolean[][] calcFootprint()
 	{
-		boolean[][] fp= new boolean[Map.WIDTH][Map.HEIGHT];
-		this.x1 = this.x - (int)this.radius;
-		this.x2 = this.x + (int)this.radius+1;
-		this.y1 = this.y - (int)this.radius;
-		this.y2 = this.y + (int)this.radius+1;
-		//scanning only the rectangle that engulfs the circle				
-		for (int i=x1; i<x2; i++)
+		Timer t = new Timer();
+		t.getElapsedTimeMil();
+		int intRadius = (int)this.radius;
+		System.out.println("DEBUG: intRadius=" + intRadius + ", radius=" + this.radius);
+		boolean[][] fp = new boolean[2*intRadius+1][2*intRadius+1];	//0.15ms
+		this.x1 = this.x - intRadius;
+		this.x2 = this.x + intRadius+1;
+		this.y1 = this.y - intRadius;
+		this.y2 = this.y + intRadius+1;
+		//scanning only the rectangle that contains the circle				
+		for (int i=0; i<2*intRadius+1; i++)
 		{
-			for (int j=y1; j<y2; j++)
+			for (int j=0; j<2*intRadius+1; j++)
 			{
 				int x,y;
-				x = i-this.x;
-				y = j-this.y;
-				if (x*x + y*y > this.radius*this.radius)
-				{
-					fp[i][j] = false;
-				}
-				else 
+				x = i-intRadius;
+				y = j-intRadius;
+				if (x*x + y*y < this.radius*this.radius)
 				{
 					fp[i][j] = true;
 				}
